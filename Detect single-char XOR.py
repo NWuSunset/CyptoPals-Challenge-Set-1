@@ -33,13 +33,19 @@ for x in strList:
 
     # convert from hex to bytes
     byes = bytes.fromhex(x)
+    print(byes)
+
     for key in range(256):  # 0-255 is all possible bytes
         decoded = ''.join(chr(i ^ key) for i in byes)
 
         lineScore += weight(decoded) #determine the score of the line
 
  #add the line score to the list, along with the decoded line
+    #print(lineScore, decoded)
     scoreList.append((lineScore, decoded))
+
+
+
 
 #find the highest score
 largest = 0
