@@ -25,7 +25,7 @@ byes = bytes.fromhex(_hex)
 
 for key in range(256): #0-255 is all possible bytes
     decoded = ''.join(chr(i ^ key) for i in byes)
-    if (decoded.isprintable()): #make sure we can print it
+    if decoded.isprintable(): #make sure we can print it
         #print(key, decoded)
         scoreList.append((weight(decoded), decoded))
 
@@ -34,6 +34,7 @@ largest = 0
 for i in range(len(scoreList)):
     if scoreList[i] > scoreList[largest]:
         largest = i
+print(largest)
 
 #Print out the answer
 print(scoreList[largest][1])

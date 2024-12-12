@@ -14,7 +14,6 @@ occurance_english = { #Dict of characters occurrences in english
     'y': 1.9913847,    'z': 0.0746517
 }
 
-#run through each line and track which line has the bset score
 
 #find the weight/score of a decoded string
 def weight(decoded):
@@ -24,34 +23,31 @@ def weight(decoded):
             score += occurance_english[i]
     return score
 
-for i in hexFile: #60 strings in the file
+#Find the highest value (number) in a list
+def findHighest(lst):
+    high = 0
+    for j in range(len(lst)):
+        if lst[j] > lst[high]:
+            high = j
+    return high
+
+#Seperate each individual string in the file into list
+for i in hexFile:
     strList.append(i)
 
+#Loop through the hex strings (lines) in the list
 for x in strList:
-    lineScore = 0
-    decoded = ''
+   lineS = []
+   bytesStr = bytes.fromhex(x) #convert to bytes
+   for key in range(256):  # Loop through all possible bytes (0-255)
+       decoded = ''.join(chr(i ^ key) for i in bytesStr) #XOR the hex string against a byte
+       lineS.append((weight(decoded), decoded)) #find out the weight/score of the XORed line
 
-    # convert from hex to bytes
-    byes = bytes.fromhex(x)
-    print(byes)
+   #find the largest decoded line (it was decoded with the most likely key)
+   largest = findHighest(lineS)
+   scoreList.append((lineS[largest][0], lineS[largest][1])) #add that line with the respective score to the list
 
-    for key in range(256):  # 0-255 is all possible bytes
-        decoded = ''.join(chr(i ^ key) for i in byes)
+#Find the line in the file that has the highest score
+largestLine = findHighest(scoreList)
+print(scoreList[largestLine][1]) #Final answer string
 
-        lineScore += weight(decoded) #determine the score of the line
-
- #add the line score to the list, along with the decoded line
-    #print(lineScore, decoded)
-    scoreList.append((lineScore, decoded))
-
-
-
-
-#find the highest score
-largest = 0
-for i in range(len(scoreList)):
-    if scoreList[i] > scoreList[largest]:
-        largest = i
-
-# Print out the answer
-print(scoreList[largest])
