@@ -1,31 +1,25 @@
 import binascii
 
-#Encypt something using the key ICE, by using repeating XOR
-
+# Encrypt something using the key ICE, by using repeating XOR
 toEncrypt = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
-key = 'ICE'
-xorStr = ''
-xorList = []
-#First convert to bytes
-#Then XOR them
-#then convert to hex
+key = "ICE"
+xorBytes = bytearray()
 
-bytesStr = bytes(toEncrypt, 'utf-8')
-bytesKey = bytes(key, 'utf-8')
+bytesStr = toEncrypt.encode('ascii')
+bytesKey = key.encode('ascii')
 
-#print(bytesKey, bytesStr)
+# XOR each byte of the input string with the corresponding byte of the key
+for i in range(len(bytesStr)):
+    xorBytes.append(bytesStr[i] ^ bytesKey[i % len(bytesKey)])
 
+    # 0 / 3 
+    # 1 / 3 
+    # 2 / 3 
 
-for j in range(len(bytesKey)):
-    xorStr = ''.join(chr(i ^ j) for i in bytesStr)
-    print(xorStr)
-
-    if j == 2: #go to the beginning again if we are at the end of the key
-       j = 0
-
-for i in xorStr:
-    xorList.append(i)
-
-#encrypted = ''.join(format(x, '02x') for x in xorStr)
-encryptedHex = binascii.hexlify(bytearray(xorList))
+# Convert the result to hex
+encryptedHex = binascii.hexlify(xorBytes).decode()
 print(encryptedHex)
+
+#Answer I get:
+# 0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
+# a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f
