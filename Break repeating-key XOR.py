@@ -1,7 +1,5 @@
-from itertools import combinations
-from os.path import split
+from itertools import combinations #Used to find all possible combinations of the split chunks in the function findKeyLen
 
-from xlwings.utils import chunk
 
 b64File = open("6base64.txt", "r")
 
@@ -24,21 +22,27 @@ def hammingDistance(str1, str2):
 
     return sum (bit1 != bit2 for bit1, bit2 in zip(bin1, bin2))
 
-def findKeyLen():
-    #split up blocks into key size
-    list = "hi guys"
+def findKeyLen(list):
+    def splitChunks(data, splitSize):
+        #str = ""
+        #for char in range(0, splitSize):
+        #    str += data[char]
+        return [data[i:i+splitSize] for i in range(0, len(data), splitSize)]
 
+    
+    for keysize in range(minKey, maxKey + 1):
+        chunks = splitChunks(list, keysize)[:4] #Take first 4 chunks of size keysize
+        #sum = sum(hammingDistance(a, b) for a, b in combinations(chunks, 2))
+    
+        if len(chunks) < 4:
+            continue #If there are not enough chunks
 
-    def splitChunks(list, size):
-        str = ""
-        for char in range(0, size):
-            str += list[char]
-        return str
+        avg = sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6 #6 possible combinations (4 choose 2)
+        print(f"Keysize: {keysize}, Average Hamming Distance: {avg}")
 
-    print(splitChunks(list, 2))
-    chunks = (splitChunks(list, 2), splitChunks(list, 10), splitChunks(list, 20), splitChunks(list, 40)) #tuple of 4 chunks
-
-    #combinations(chunks, chunk())
+    
+    #avg = sum / 6*38 #Choose two chunks out of the number of chunks and do the hamming distance for them
+                                                                             #then divide by 4 choose 2 = 6 (6 possible combinations)(total combinations)
 
 
    # blocks, blockSize = len(list), int(len(list)/5)
@@ -48,9 +52,9 @@ def findKeyLen():
 
 print(hammingDistance(str1, str2))
 
-for i in b64File:
-    strList.append(i)
+for line in b64File:
+    strList.append(line.strip())
 
-findKeyLen()
+findKeyLen(''.join(strList)) #Join the list of strings into one string
 
 
