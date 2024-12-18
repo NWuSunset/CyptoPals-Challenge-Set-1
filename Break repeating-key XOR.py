@@ -37,10 +37,19 @@ def findKeyLen(list):
         if len(chunks) < 4:
             continue #If there are not enough chunks skip this keysize (shouldn't happen)
                                                              # 6 possible combinations (4 choose 2)
-        avg = (sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6)/keysize #Divide by keysize to normalize
-        print(f"Keysize: {keysize}, Average Hamming Distance: {avg}")
+        #avg = (sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6)/keysize #Divide by keysize to normalize
+        #print(f"Keysize: {keysize}, Average Hamming Distance: {avg}")
 
-        lowest.append((avg, keysize))
+        #lowest.append((avg, keysize))
+
+        #without using combinations in case that causes issues
+        distances = [hammingDistance(chunks[i], chunks[j]) for i in range(len(chunks)) for j in range(i + 1, len(chunks))]
+        avg_distance = sum(distances) / len(distances)  # Average the distances
+        normalized_distance = avg_distance / keysize  # Normalize by keysize
+
+        print(f"Keysize: {keysize}, Average Hamming Distance: {normalized_distance}")
+        lowest.append((normalized_distance, keysize))
+
 
     lowest.sort()
     return lowest
@@ -60,6 +69,6 @@ for line in b64File:
 print(findKeyLen(''.join(strList))[:5]) #Join the list of strings into one string
 
 possibleKeys = findKeyLen(''.join(strList))[:5]
-
-transpose(possibleKeys[][0], possibleKeys[][1])
+print(possibleKeys)
+#transpose(possibleKeys[][0], possibleKeys[][1])
 
