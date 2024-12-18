@@ -22,39 +22,44 @@ def hammingDistance(str1, str2):
 
     return sum (bit1 != bit2 for bit1, bit2 in zip(bin1, bin2))
 
-def findKeyLen(list):
-    def splitChunks(data, splitSize):
-        #str = ""
-        #for char in range(0, splitSize):
-        #    str += data[char]
-        return [data[i:i+splitSize] for i in range(0, len(data), splitSize)]
+#Splits ciphertext into chunks of size 'splitSize'
+def splitChunks(data, splitSize):
+    return [data[i:i+splitSize] for i in range(0, len(data), splitSize)] #returns a list of the string split by keysize
 
-    
+def findKeyLen(list):
+    lowest = [] #list from lowest from highest
+    temp = 100
+
+
     for keysize in range(minKey, maxKey + 1):
-        chunks = splitChunks(list, keysize)[:4] #Take first 4 chunks of size keysize
-        #sum = sum(hammingDistance(a, b) for a, b in combinations(chunks, 2))
+        chunks = splitChunks(list, keysize)[:4] #Take only the first 4 blocks (of size keysize)
     
         if len(chunks) < 4:
-            continue #If there are not enough chunks
-
-        avg = sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6 #6 possible combinations (4 choose 2)
+            continue #If there are not enough chunks skip this keysize (shouldn't happen)
+                                                             # 6 possible combinations (4 choose 2)
+        avg = (sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6)/keysize #Divide by keysize to normalize
         print(f"Keysize: {keysize}, Average Hamming Distance: {avg}")
 
-    
-    #avg = sum / 6*38 #Choose two chunks out of the number of chunks and do the hamming distance for them
-                                                                             #then divide by 4 choose 2 = 6 (6 possible combinations)(total combinations)
+        lowest.append((avg, keysize))
 
+    lowest.sort()
+    return lowest
 
-   # blocks, blockSize = len(list), int(len(list)/5)
-   #  list[j:j+blockSize] for j in range(0, blocks, blockSize)
-
-    #avg = sum(hammingDistance(a, b) for a, b in)
+def transpose(blocks, blocksize):
+    ret = []
+    #make a block that is the first byte of every block, and a block that is the second byte of every block, and so on.
+    for j in range(len(blocks) + 1):
+     ret.append(blocks[i] for i in range(0, len(blocks), blocksize + j)) #returns list of the j byte in every block
+    return ret
 
 print(hammingDistance(str1, str2))
 
 for line in b64File:
     strList.append(line.strip())
 
-findKeyLen(''.join(strList)) #Join the list of strings into one string
+print(findKeyLen(''.join(strList))[:5]) #Join the list of strings into one string
 
+possibleKeys = findKeyLen(''.join(strList))[:5]
+
+transpose(possibleKeys[][0], possibleKeys[][1])
 
