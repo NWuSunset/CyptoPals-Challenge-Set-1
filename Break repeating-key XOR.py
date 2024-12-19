@@ -1,8 +1,4 @@
 from itertools import combinations #Used to find all possible combinations of the split chunks in the function findKeyLen
-from os.path import split
-
-from sympy.physics.quantum.gate import normalized
-from xlwings.utils import chunk
 
 b64File = open("6base64.txt", "r")
 
@@ -81,7 +77,7 @@ topSplitSizes = [] #List of lists of the original string broken into the top 5 k
 #loop through the original
 for i in range(len(possibleKeys)):
     temp = [splitChunks(''.join(strList), possibleKeys[i][1])]
-    #if temp[len(temp)] !=
-        continue #skip this key
+    #if temp[len(temp) - 1] != possibleKeys[i][1]:
+    #    continue #skip this key
     topSplitSizes.append(splitChunks(''.join(strList) , possibleKeys[i][1]))
 print(topSplitSizes)
