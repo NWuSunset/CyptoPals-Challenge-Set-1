@@ -1,4 +1,6 @@
 from itertools import combinations #Used to find all possible combinations of the split chunks in the function findKeyLen
+from base64 import b64decode
+
 
 b64File = open("6base64.txt", "r")
 
@@ -25,45 +27,47 @@ def hammingDistance(str1, str2):
 def splitChunks(data, splitSize):
     return [data[i:i+splitSize] for i in range(0, len(data), splitSize)] #returns a list of the string split by keysize
 
-def findKeyLen(list):
-    lowest = [] #list from lowest from highest
-    temp = 100
 
-
-    for keysize in range(minKey, maxKey + 1):
-        chunks = splitChunks(list, keysize)[:4] #Take only the first 4 blocks (of size keysize)
+def normalized_distance(list, keysize):
+    chunks = splitChunks(list, keysize)[:4] #Take only the first 4 blocks (of size keysize)
     
-        if len(chunks) < 4:
-            continue #If there are not enough chunks skip this keysize (shouldn't happen)
+    if len(chunks) < 4:
+        return #If there are not enough chunks skip this keysize (shouldn't happen)
                                                              # 6 possible combinations (4 choose 2)
-        avg = (sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6)
-        normalized_distance = avg / keysize #Divide by keysize to normalize
+    avg = (sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6)
+    return avg / keysize #Divide by keysize to normalize
 
+    #without using combinations in case that causes issues
+    #distances = [hammingDistance(chunks[i], chunks[j]) for i in range(len(chunks)) for j in range(i + 1, len(chunks))]
+    #avg_distance = sum(distances) / len(distances)  # Average the distances
+    #normalized_distance = avg_distance / keysize  # Normalize by keysize
 
-        #without using combinations in case that causes issues
-        #distances = [hammingDistance(chunks[i], chunks[j]) for i in range(len(chunks)) for j in range(i + 1, len(chunks))]
-        #avg_distance = sum(distances) / len(distances)  # Average the distances
-        #normalized_distance = avg_distance / keysize  # Normalize by keysize
+def findKeyLen(list):
+    lowest = []
 
-        print(f"Keysize: {keysize}, Normalized avg Hamming Distance: {normalized_distance}")
-        lowest.append((normalized_distance, keysize))
+    for keysize in range(minKey, maxKey):
+        distance = normalized_distance(list, keysize)
+        print(f"Keysize: {keysize}, Normalized avg Hamming Distance: {distance}")
+        lowest.append((distance, keysize))
 
     lowest.sort()
     return lowest
 
 def transpose(blocks, blocksize):
-    ret = []
-    print(blocksize)
+    
+    #print(blocksize)
     #make a block that is the first byte of every block, and a block that is the second byte of every block, and so on.
-    for byteNum in range(blocksize):
+    #for byteNum in range(blocksize):
      #ret.append(blocks[block][byteNum] for block in range(len(blocks))) #appends blocks of bytes at position 'byteNum' in the blocks
-     for block in range(len(blocks)):
+     #for block in range(len(blocks)):
 
-        print(blocks[block])
-        print(blocks[block][byteNum])
+      #  print(blocks[block])
+       # print(blocks[block][byteNum])
 
+    chunks = splitChunks(blocks, blocksize)
+    transposed = list(zip(*chunks)) #zip all the values in the chunk list
 
-    return ret #returns list of byte blocks
+    return transposed #returns list of byte blocks
 
 print(hammingDistance(str1, str2)) #verifies if hamming distance is write
 
@@ -73,11 +77,14 @@ for line in b64File:
 possibleKeys = findKeyLen(''.join(strList))[:5]
 print(possibleKeys)
 
-topSplitSizes = [] #List of lists of the original string broken into the top 5 keysizes
+test = transpose(strList, possibleKeys[0][1])
+print(test)
+
+#topSplitSizes = [] #List of lists of the original string broken into the top 5 keysizes
 #loop through the original
-for i in range(len(possibleKeys)):
-    temp = [splitChunks(''.join(strList), possibleKeys[i][1])]
+#for i in range(len(possibleKeys)):
+ #   temp = [splitChunks(''.join(strList), possibleKeys[i][1])]
     #if temp[len(temp) - 1] != possibleKeys[i][1]:
     #    continue #skip this key
-    topSplitSizes.append(splitChunks(''.join(strList) , possibleKeys[i][1]))
-print(topSplitSizes)
+  #  topSplitSizes.append(splitChunks(''.join(strList) , possibleKeys[i][1]))
+#print(topSplitSizes)
