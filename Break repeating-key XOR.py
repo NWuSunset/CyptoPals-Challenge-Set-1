@@ -1,5 +1,8 @@
 from itertools import combinations #Used to find all possible combinations of the split chunks in the function findKeyLen
+from os.path import split
 
+from sympy.physics.quantum.gate import normalized
+from xlwings.utils import chunk
 
 b64File = open("6base64.txt", "r")
 
@@ -37,38 +40,48 @@ def findKeyLen(list):
         if len(chunks) < 4:
             continue #If there are not enough chunks skip this keysize (shouldn't happen)
                                                              # 6 possible combinations (4 choose 2)
-        #avg = (sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6)/keysize #Divide by keysize to normalize
-        #print(f"Keysize: {keysize}, Average Hamming Distance: {avg}")
+        avg = (sum(hammingDistance(a, b) for a, b in combinations(chunks, 2)) / 6)
+        normalized_distance = avg / keysize #Divide by keysize to normalize
 
-        #lowest.append((avg, keysize))
 
         #without using combinations in case that causes issues
-        distances = [hammingDistance(chunks[i], chunks[j]) for i in range(len(chunks)) for j in range(i + 1, len(chunks))]
-        avg_distance = sum(distances) / len(distances)  # Average the distances
-        normalized_distance = avg_distance / keysize  # Normalize by keysize
+        #distances = [hammingDistance(chunks[i], chunks[j]) for i in range(len(chunks)) for j in range(i + 1, len(chunks))]
+        #avg_distance = sum(distances) / len(distances)  # Average the distances
+        #normalized_distance = avg_distance / keysize  # Normalize by keysize
 
-        print(f"Keysize: {keysize}, Average Hamming Distance: {normalized_distance}")
+        print(f"Keysize: {keysize}, Normalized avg Hamming Distance: {normalized_distance}")
         lowest.append((normalized_distance, keysize))
-
 
     lowest.sort()
     return lowest
 
 def transpose(blocks, blocksize):
     ret = []
+    print(blocksize)
     #make a block that is the first byte of every block, and a block that is the second byte of every block, and so on.
-    for j in range(len(blocks) + 1):
-     ret.append(blocks[i] for i in range(0, len(blocks), blocksize + j)) #returns list of the j byte in every block
-    return ret
+    for byteNum in range(blocksize):
+     #ret.append(blocks[block][byteNum] for block in range(len(blocks))) #appends blocks of bytes at position 'byteNum' in the blocks
+     for block in range(len(blocks)):
 
-print(hammingDistance(str1, str2))
+        print(blocks[block])
+        print(blocks[block][byteNum])
+
+
+    return ret #returns list of byte blocks
+
+print(hammingDistance(str1, str2)) #verifies if hamming distance is write
 
 for line in b64File:
     strList.append(line.strip())
 
-print(findKeyLen(''.join(strList))[:5]) #Join the list of strings into one string
-
 possibleKeys = findKeyLen(''.join(strList))[:5]
 print(possibleKeys)
-#transpose(possibleKeys[][0], possibleKeys[][1])
 
+topSplitSizes = [] #List of lists of the original string broken into the top 5 keysizes
+#loop through the original
+for i in range(len(possibleKeys)):
+    temp = [splitChunks(''.join(strList), possibleKeys[i][1])]
+    #if temp[len(temp)] !=
+        continue #skip this key
+    topSplitSizes.append(splitChunks(''.join(strList) , possibleKeys[i][1]))
+print(topSplitSizes)
