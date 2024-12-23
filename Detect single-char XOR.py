@@ -41,13 +41,14 @@ for x in strList:
    bytesStr = bytes.fromhex(x) #convert to bytes
    for key in range(256):  # Loop through all possible bytes (0-255)
        decoded = ''.join(chr(i ^ key) for i in bytesStr) #XOR the hex string against a byte
-       lineS.append((weight(decoded), decoded)) #find out the weight/score of the XORed line
+       lineS.append((weight(decoded), decoded, key)) #find out the weight/score of the XORed line
 
    #find the largest decoded line (it was decoded with the most likely key)
    largest = findHighest(lineS)
-   scoreList.append((lineS[largest][0], lineS[largest][1])) #add that line with the respective score to the list
+   scoreList.append((lineS[largest][0], lineS[largest][1], lineS[largest][2])) #add that line with the respective score to the list
 
 #Find the line in the file that has the highest score
 largestLine = findHighest(scoreList)
 print(scoreList[largestLine][1]) #Final answer string
-
+print(chr(scoreList[largestLine][2])) #Final answer key
+#print(scoreList[largestLine][2])
